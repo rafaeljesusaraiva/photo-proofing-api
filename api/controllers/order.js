@@ -178,7 +178,10 @@ module.exports = () => {
         .populate('products.size')
         .populate('products.item')
         .then(data => { 
-            res.send(data)
+            res.status(200).json({
+                status: 'success',
+                message: data
+            })
         })
         .catch(err => {
             res.status(500).send({
