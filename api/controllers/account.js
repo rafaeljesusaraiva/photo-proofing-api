@@ -94,6 +94,25 @@ module.exports = () => {
             });
     };
 
+    controller.findOneById = async (req, res) => {
+        const id = req.params.id;
+        let userInfo = await Account.findById(id).lean();
+        if (userInfo === null) {
+            return res.status(500).send({
+                status: 'error',
+                message: 'Conta não encontrada => id: '+id
+            });
+        }
+
+        let userOrders = await Order.find({ client: id });
+        userInfo.orders = userOrders;
+
+        return res.send({ 
+            status: 'success',
+            message: userInfo
+        });
+    };
+
     controller.findAll = async (req, res) => {
         let info = await Account.find({}).sort('name').lean();
         if (info === null) {
@@ -117,7 +136,7 @@ module.exports = () => {
         return res.send({ 
             status: 'success',
             message: info
-        });;
+        });
     };
 
     controller.update = (req, res) => {
@@ -129,20 +148,16 @@ module.exports = () => {
         }
     
         const id = req.params.id;
-
-        console.log('aqui')
     
         Account.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
         .then(data => {
             if (data === null || !data) throw 'Conta não encontrada!';
-            console.log('aqui2 ', data)
             res.send({ 
                 status: 'success',
                 message: `Conta '${data.name}' foi atualizada com sucesso!` 
             });
         })
         .catch(err => {
-            console.log('aqui2 ', err)
             return res.status(500).send({
                 status: 'error',
                 message: 'Erro ao atualizar conta. ' + err
