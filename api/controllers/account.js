@@ -1,5 +1,6 @@
 const db = require("../models");
 const Account = db.account;
+const Order = db.order;
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
 const nodemailer = require('nodemailer');
@@ -93,20 +94,30 @@ module.exports = () => {
             });
     };
 
-    controller.findAll = (req, res) => {
-        Account.find({})
-        .then(data => { 
-            res.send({ 
-                status: 'success', 
-                message: data 
-            }); 
-        })
-        .catch(err => {
+    controller.findAll = async (req, res) => {
+        let info = await Account.find({}).sort('name').lean();
+        if (info === null) {
             return res.status(500).send({
                 status: 'error',
                 message: 'Erro ao procurar todas as contas => ' + err
             });
-        });
+        }
+
+        await Promise.all(
+            info.map(async (element, index) => {
+                let orderNumber = await Order.find({ client: element._id }).lean().exec();
+                if (orderNumber === null) {
+                    info[index].numberOfOrders = 0;
+                } else {
+                    info[index].numberOfOrders = orderNumber.length;
+                }
+            })
+        );
+
+        return res.send({ 
+            status: 'success',
+            message: info
+        });;
     };
 
     controller.update = (req, res) => {
