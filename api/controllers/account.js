@@ -3,11 +3,11 @@ const Account = db.account;
 const Order = db.order;
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
-const nodemailer = require('nodemailer');
 var dayjs = require('dayjs');
 require('dayjs/locale/pt')
 dayjs.locale('pt')
 const { v4: uuidv4 } = require('uuid');
+const mail = require('../extra/mail')
 
 module.exports = () => {
     const controller = {};
@@ -250,31 +250,11 @@ module.exports = () => {
             }
         });
 
-        let transporter = nodemailer.createTransport({
-            host: process.env.NODEMAILER_HOST,
-            secure: true,
-            port: process.env.NODEMAILER_PORT,
-            auth: {
-              user: process.env.NODEMAILER_USER,
-              pass: process.env.NODEMAILER_PASS,
-            },
-        });
-
-        const mailOptions = {
-            from: 'noreply <noreply@rafaeljesusaraiva.pt>', // sender address
-            to: req.body.email, // 
-            subject: '[Prova Fotografias] Repor palavra-passe', // Subject line
-            html: `Se não pretende alterar a sua palavra-passe, ignore este email. Caso contrário, o link é válido por 30 minutos. (Até às ${dayjs(validationObject.validUntil).format('HH:mm [de] DD/MM/YYYY')}) <br/><br/> http://192.168.1.69:8080/alterar-password?token=`+validationObject.token, // plain text body
-        };
-        await transporter.sendMail(mailOptions, function(err, info) {
-            if (err) {
-                console.log(err)
-                return res.status(500).send({
-                    status: 'error',
-                    message: "Erro ao enviar email. ", err
-                })
-            }
-        })
+        await mail.sendEmail(
+            req.body.email,
+            '[Prova Fotografias] Repor palavra-passe',
+            `Se não pretende alterar a sua palavra-passe, ignore este email. Caso contrário, o link é válido por 30 minutos. (Até às ${dayjs(validationObject.validUntil).format('HH:mm [de] DD/MM/YYYY')}) <br/><br/> ${process.env.API_URL}/alterar-password?token=`+validationObject.token
+        )
 
         res.send({ 
             status: 'success', 

@@ -5,6 +5,7 @@ const Promotion = require("../models").promotion;
 const Photo = require("../models").photo;
 const PhotoSize = require("../models").photo_size;
 var dayjs = require('dayjs');
+const mail = require('../extra/mail');
 
 module.exports = () => {
     const controller = {};
@@ -91,7 +92,12 @@ module.exports = () => {
             {useFindAndModify: false}
         ).exec();
 
-        newOrder.save(newOrder).then(data => { 
+        newOrder.save(newOrder).then(async data => { 
+            await mail.sendEmail(
+                validClient.email,
+                `[Prova Fotografias] Nova Encomenda #${data.orderCount.toString().padStart(4, '0')}`,
+                `Nova encomenda efetuada. Pode consultar mais informações em: ${process.env.API_URL}/encomendas`
+            );
             res.send({
                 status: 'success',
                 message: data
@@ -365,6 +371,7 @@ module.exports = () => {
 
         const id = req.params.id;
         let currentOrder = await Order.findById(id)
+                                        .populate('client')
                                         .then(data => { if (data === null) throw 'not found'; return data; })
                                         .catch(err => {
                                             res.status(500).send({
@@ -434,7 +441,12 @@ module.exports = () => {
             }
         }
         if (req.body.orderStatus && currentOrder.isValidStatus(req.body.orderStatus)) {
-            currentOrder.updateStatus(req.body.orderStatus)
+            currentOrder.updateStatus(req.body.orderStatus);
+            await mail.sendEmail(
+                currentOrder.client.email,
+                `[Prova Fotografias] Atualização Encomenda #${currentOrder.orderCount.toString().padStart(4, '0')}`,
+                `A sua encomenda #${currentOrder.orderCount.toString().padStart(4, '0')} mudou para "${req.body.orderStatus}". Pode consultar mais informações em: ${process.env.API_URL}/encomendas`
+            );
         }
         if (req.body.promotionCode) {
             let newPromo = await Promotion.findOne({ code: req.body.promotionCode })
