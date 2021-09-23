@@ -21,7 +21,7 @@ module.exports = app => {
   app.route('/account').get(auth.isAdmin, controller.findOne);
   // Get all Accounts
   app.route('/account/all').get(auth.isAdmin, controller.findAll);
-  // Update Account Info
+  // Get Account Info
   app.route('/account/:id').get(auth.isAuthenticated, controller.findOneById);
   // Update Account Info
   app.route('/account/:id').post(auth.isAuthenticated, controller.update);

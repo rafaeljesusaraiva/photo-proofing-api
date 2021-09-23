@@ -175,8 +175,17 @@ module.exports = () => {
         .populate('client')
         .populate('promotion')
         .populate('payment')
-        .populate('products.size')
-        .populate('products.item')
+        .populate({
+            path : 'products',
+            populate : {
+                path : 'item',
+                populate : { path : 'album' }
+            }
+        })
+        .populate({
+            path : 'products',
+            populate : { path : 'size' }
+        })
         .then(data => { 
             res.status(200).json({
                 status: 'success',
@@ -191,11 +200,43 @@ module.exports = () => {
         });
     };
 
+    controller.findOne_admin = (req, res) => {
+        const id = req.params.id;
+
+        Order.findById(id)
+            .populate('client')
+            .populate('promotion')
+            .populate('payment')
+            .populate({
+                path : 'products',
+                populate : {
+                    path : 'item',
+                    populate : { path : 'album' }
+                }
+            })
+            .populate({
+                path : 'products',
+                populate : { path : 'size' }
+            })
+            .then(data => { 
+                res.status(200).json({
+                    status: 'success',
+                    message: data
+                })
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                    err.message || "Some error occurred while retrieving orders."
+                });
+            });
+    }
+
     controller.stats_admin = async (req, res) => {
 
         let currentDate = dayjs().add(12, 'hour');
         let weeksAgo = dayjs().subtract(14, 'day');
-        const orders = await Order.find({createdAt: { $gte: weeksAgo, $lt: currentDate }})
+        const orders = await Order.find({createdAt: { $gte: weeksAgo, $lt: currentDate }, status: { $ne: "Cancelada" }})
                                     .populate('client')
                                     .populate('promotion')
                                     .populate({

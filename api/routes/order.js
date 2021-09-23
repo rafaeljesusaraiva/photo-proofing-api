@@ -11,6 +11,8 @@ module.exports = app => {
   app.route('/order/all_admin').get(auth.isAdmin, controller.findAll_admin);
   // Get Order Stats (admin)
   app.route('/order/stats').get(auth.isAdmin, controller.stats_admin);
+  // Get all Orders (admin)
+  app.route('/order/:id').get(auth.isAdmin, controller.findOne_admin);
   // Update Order Info
   app.route('/order/:id').post(auth.isAdmin, controller.update);
   // Delete Order
