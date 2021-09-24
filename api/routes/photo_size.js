@@ -9,6 +9,8 @@ module.exports = app => {
   app.route('/photo_size/all').get(controller.findAll_public);
   // Get all Sizes (admin)
   app.route('/photo_size/all_admin').get(auth.isAdmin, controller.findAll_admin);
+  // Get one Size (admin)
+  app.route('/photo_size/:id').get(auth.isAdmin, controller.findOne_admin);
   // Update Size Info
   app.route('/photo_size/:id').post(auth.isAdmin, controller.update);
   // Delete Size

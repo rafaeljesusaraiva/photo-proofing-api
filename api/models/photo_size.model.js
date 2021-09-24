@@ -8,7 +8,8 @@ module.exports = mongoose => {
                     minimumQuantity: { type: Number, required: true },
                     price: { type: Number, required: true }
                 }
-            ]
+            ],
+            public: { type: String, required: true, default: "true" }
         },
         { timestamps: true }
     );

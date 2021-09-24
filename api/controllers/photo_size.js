@@ -42,7 +42,7 @@ module.exports = () => {
     };
 
     controller.findAll_public = (req, res) => {
-        PhotoSize.find({})
+        PhotoSize.find({ public: { $ne: "false" } })
         .then(data => { 
             res.send({
                 status: 'success',
@@ -62,7 +62,28 @@ module.exports = () => {
     controller.findAll_admin = (req, res) => {
         PhotoSize.find({})
         .then(data => { 
-            res.send(data); 
+            res.send({
+                status: 'success',
+                message: data
+            }); 
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Some error occurred while retrieving photo sizes."
+            });
+        });
+    };
+
+    controller.findOne_admin = (req, res) => {
+        const id = req.params.id;
+
+        PhotoSize.findById(id)
+        .then(data => { 
+            res.send({
+                status: 'success',
+                message: data
+            }); 
         })
         .catch(err => {
             res.status(500).send({
