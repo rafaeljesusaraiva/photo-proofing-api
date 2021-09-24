@@ -12,6 +12,9 @@ module.exports = app => {
   // Get all Albums (admin)
   app.route('/album/all').get(auth.isAdmin, controller.findAll_admin);
 
+  // Get one Album (admin)
+  app.route('/album/:id').get(auth.isAdmin, controller.findOne_admin);
+
   // Update Album Info
   app.route('/album/:id').post(auth.isAdmin, controller.update);
 

@@ -4,15 +4,7 @@ const Photo = require("../models").photo;
 const fs = require('fs');
 const path = require("path");
 const uploadFile = require("../middleware/file.upload");
-
-function isDate(str) {    
-    var parms = str.split(/[\.\-\/]/);
-    var yyyy = parseInt(parms[2],10);
-    var mm   = parseInt(parms[1],10);
-    var dd   = parseInt(parms[0],10);
-    var date = new Date(yyyy,mm-1,dd,0,0,0,0);
-    return mm === (date.getMonth()+1) && dd === date.getDate() && yyyy === date.getFullYear();
-}
+const dayjs = require("dayjs")
 
 function dateForMongoose(str) {
     var parms = str.split(/[\.\-\/]/);
@@ -23,13 +15,10 @@ function dateForMongoose(str) {
 }
 
 function processDate(strDate, type) {
-    if (!isDate(strDate) || strDate === undefined) {
-        res.status(400).send({ 
-            status: 'invalid',
-            message: `Data ${type} tem o formato inválido! Formato correto DD-MM-AAAA.` 
-        });
+    if (!dayjs(strDate).isValid() || strDate === undefined) {
+        return false;
     } else {
-        return dateForMongoose(strDate);
+        return dateForMongoose(dayjs(strDate).format('DD-MM-YYYY'));
     }
 }
 
@@ -62,7 +51,7 @@ module.exports = () => {
             if (error.code === "LIMIT_UNEXPECTED_FILE") {
                 return res.status(404).json({ 
                     status: 'error', 
-                    message: 'Ficheiro de formato inesperado. ' + err
+                    message: 'Ficheiro de formato inesperado. ' + error
                 })
             }
             return res.status(404).json({ 
@@ -70,14 +59,13 @@ module.exports = () => {
                 message: 'Limite de ficheiros a carregar ultrapassado (2000 ficheiros).'
             })
         }
-
-        const { title, date_event, date_available, date_finalOrder } = req.body;
+        const { title, date_event, date_available, date_finalOrder, slug } = req.body;
 
         // Validate request
-        if (!title) {
+        if (!title || !slug || title === '' || slug === '') {
             return res.status(400).send({
                 status: 'invalid',
-                message: "Pedido à espera de 'title' (opcional 'date_event', 'date_available', 'date_finalOrder')."
+                message: "Pedido à espera de 'title' e 'slug' (opcional 'date_event', 'date_available', 'date_finalOrder')."
             });
         }
 
@@ -85,11 +73,19 @@ module.exports = () => {
             tdate_available = processDate(date_available, 'available'), 
             tdate_finalOrder = processDate(date_finalOrder, 'finalOrder');
 
+        if (tdate_event === false || tdate_available === false || tdate_finalOrder === false) {
+            return res.status(400).send({ 
+                status: 'invalid',
+                message: `Data tem o formato inválido! Formato correto DD-MM-AAAA. ${tdate_event} ${tdate_available} ${tdate_finalOrder}` 
+            });
+        }
+
         const newAlbum = new Album({
             title: title,
             date_event: tdate_event,
             date_available: tdate_available,
-            date_finalOrder: tdate_finalOrder
+            date_finalOrder: tdate_finalOrder,
+            slug: slug
         });
 
         newAlbum.save(newAlbum).then(data => { 
@@ -104,7 +100,7 @@ module.exports = () => {
             let fileFinal = path.join(albumPath, data.slug+'.jpg')
             fs.rename(fileToMove, fileFinal, function (err) {
                 if (err) {
-                    throw err;
+                    throw 'File Renaming - '+err;
                 }
             });
 
@@ -165,6 +161,31 @@ module.exports = () => {
 
     controller.findAll_admin = (req, res) => {
         Album.find({})
+        .lean()
+        .populate('images')
+        .populate('watermarked')
+        .then(data => { 
+            data.forEach(item => {
+                item.watermarked = item.watermarked.map(image => ({ ...image, filepath: `/public/album/${item.slug}/${image.filename}` }))
+                item.images = item.images.map(image => ({ ...image, filepath: `/public/album_delivery/${item._id}/${image.filename}` }))
+            })
+            res.send({
+                status: 'success',
+                message: data
+            }); 
+        })
+        .catch(err => {
+            return res.status(500).send({
+                status: 'error',
+                message: 'Erro ao procurar álbuns => ' + err
+            });
+        });
+    };
+
+    controller.findOne_admin = (req, res) => {
+        const album_id = req.params.id;
+
+        Album.findById(album_id)
         .lean()
         .populate('images')
         .populate('watermarked')
