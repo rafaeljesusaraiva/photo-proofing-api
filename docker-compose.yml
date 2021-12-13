@@ -1,0 +1,7 @@
+version: '3'
+services:
+  rafaeljesusaraiva-api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: rafaeljesusaraiva-api/latest
