@@ -11,6 +11,6 @@ RUN yarn
 COPY . .
 RUN mkdir -p /saruman-data/rafaeljesusaraiva-api/public
 
-EXPOSE 4000
+EXPOSE 8010
 
 CMD ["yarn", "start"]
