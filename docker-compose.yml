@@ -16,3 +16,6 @@ services:
       - NODEMAILER_PORT=${NODEMAILER_PORT}
       - NODEMAILER_USER=${NODEMAILER_USER}
       - NODEMAILER_PASS=${NODEMAILER_PASS}
+
+volumes:
+  saruman-docker-data:
