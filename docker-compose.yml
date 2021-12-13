@@ -7,4 +7,13 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       -  saruman-docker-data/rafaeljesusaraiva-api:/rafaeljesusaraiva-api:
+    environment:
+      - TOKEN_KEY=${TOKEN_KEY}
+      - INFLUXDB_HOST=${INFLUXDB_HOST}
+      - INFLUXDB_PORT=${INFLUXDB_PORT}
+      - INFLUXDB_DBNAME=${INFLUXDB_DBNAME}
+      - NODEMAILER_HOST=${NODEMAILER_HOST}
+      - NODEMAILER_PORT=${NODEMAILER_PORT}
+      - NODEMAILER_USER=${NODEMAILER_USER}
+      - NODEMAILER_PASS=${NODEMAILER_PASS}
   saruman-docker-data:
