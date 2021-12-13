@@ -21,3 +21,8 @@ services:
 
 volumes:
   saruman-docker-data:
+
+networks:
+  default:
+    external: true
+    name: rafaeljesusaraiva_api
