@@ -42,7 +42,7 @@ module.exports = () => {
         newAccount.token = token;
 
         newAccount.save(newAccount) 
-                    .then(data => { 
+                    .then(async data => { 
                         res.send({ 
                             status: 'success', 
                             message: data 

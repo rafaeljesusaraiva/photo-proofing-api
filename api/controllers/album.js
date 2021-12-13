@@ -56,7 +56,7 @@ module.exports = () => {
             }
             return res.status(404).json({ 
                 status: 'error', 
-                message: 'Limite de ficheiros a carregar ultrapassado (2000 ficheiros).'
+                message: 'Limite de ficheiros a carregar ultrapassado (2000 ficheiros).' + error
             })
         }
         const { title, date_event, date_available, date_finalOrder, slug } = req.body;
