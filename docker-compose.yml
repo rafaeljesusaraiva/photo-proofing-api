@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: rafaeljesusaraiva-api/latest
     volumes:
-      - saruman-docker-data/rafaeljesusaraiva-api:/rafaeljesusaraiva-api:
+      - saruman-docker-data/rafaeljesusaraiva-api:/rafaeljesusaraiva-api
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
