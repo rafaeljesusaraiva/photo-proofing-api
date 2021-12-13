@@ -18,11 +18,7 @@ services:
       - NODEMAILER_PORT=${NODEMAILER_PORT}
       - NODEMAILER_USER=${NODEMAILER_USER}
       - NODEMAILER_PASS=${NODEMAILER_PASS}
+    network_mode: host
 
 volumes:
   saruman-docker-data:
-
-networks:
-  default:
-    external: true
-    name: rafaeljesusaraiva_api
