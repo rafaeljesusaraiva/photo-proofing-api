@@ -5,3 +5,6 @@ services:
       context: ./
       dockerfile: Dockerfile
     image: rafaeljesusaraiva-api/latest
+    volumes:
+      -  saruman-docker-data/rafaeljesusaraiva-api:/rafaeljesusaraiva-api:
+  saruman-docker-data:
