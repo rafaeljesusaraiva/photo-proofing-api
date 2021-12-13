@@ -23,5 +23,7 @@ services:
 
 volumes:
   saruman-docker-data:
-    external: true
-    name: saruman-docker-data
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.183,ro
+      device: :/mnt/user/proxmox-docker-data/
