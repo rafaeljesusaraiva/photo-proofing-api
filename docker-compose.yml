@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: rafaeljesusaraiva-api/latest
     volumes:
-      - saruman-docker-data/rafaeljesusaraiva-api-public:/saruman-data/rafaeljesusaraiva-api/public
+      - saruman-docker-data:/saruman-data
     ports:
       - "8010:8010"
     environment:

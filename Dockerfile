@@ -1,5 +1,5 @@
 FROM node:16
-WORKDIR /saruman-data/rafaeljesusaraiva-api
+WORKDIR /rafaeljesusaraiva-api
 
 COPY package*.json ./
 
@@ -9,7 +9,8 @@ RUN yarn
 
 # COPY app source
 COPY . .
-RUN mkdir -p /saruman-data/rafaeljesusaraiva-api/public
+# RUN mkdir -p /rafaeljesusaraiva-api/public
+RUN ln -s /saruman-data/rafaeljesusaraiva-api-public /rafaeljesusaraiva-api/public
 
 EXPOSE 8010
 
