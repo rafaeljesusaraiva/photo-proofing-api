@@ -1,9 +1,7 @@
 FROM node:16
 WORKDIR /saruman-data/rafaeljesusaraiva-api
 
-COPY package*.json ./
-
-RUN ls -la /
+COPY package*.json /saruman-data/rafaeljesusaraiva-api
 
 # Install api dependencies
 RUN npm install -g nodemon
