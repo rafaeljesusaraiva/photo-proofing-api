@@ -2,7 +2,7 @@ FROM node:16
 WORKDIR /saruman-data/rafaeljesusaraiva-api
 
 # Install api dependencies
-COPY package*.json ./
+COPY package.json ./
 RUN npm install -g nodemon
 RUN yarn
 
