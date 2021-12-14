@@ -1,5 +1,4 @@
 FROM node:16
-RUN mkdir /saruman-data/rafaeljesusaraiva-api
 WORKDIR /saruman-data/rafaeljesusaraiva-api
 
 # Install api dependencies
