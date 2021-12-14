@@ -190,10 +190,8 @@ module.exports = () => {
         .populate('images')
         .populate('watermarked')
         .then(data => { 
-            data.forEach(item => {
-                item.watermarked = item.watermarked.map(image => ({ ...image, filepath: `/public/album/${item.slug}/${image.filename}` }))
-                item.images = item.images.map(image => ({ ...image, filepath: `/public/album_delivery/${item._id}/${image.filename}` }))
-            })
+            data.watermarked = data.watermarked.map(image => ({ ...image, filepath: `/public/album/${data.slug}/${image.filename}` }))
+            data.images = data.images.map(image => ({ ...image, filepath: `/public/album_delivery/${data._id}/${image.filename}` }))
             res.send({
                 status: 'success',
                 message: data
