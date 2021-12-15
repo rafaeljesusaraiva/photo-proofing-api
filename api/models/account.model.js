@@ -81,6 +81,13 @@ module.exports = mongoose => {
             return false;
         }
     }
+
+    schema.methods.isSelf = function (cb) {
+      if (this._id == cb) {
+        return true;
+      }
+      return false;
+  }
   
     return mongoose.model("account", schema);
 };

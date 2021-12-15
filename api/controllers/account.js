@@ -148,10 +148,9 @@ module.exports = () => {
         }
     
         const id = req.params.id;
-
         // Find if Current user is admin or self
         let gotUser = await Account.findOne({ _id: id });
-        if (!gotUser.isAdmin() && gotUser._id !== req.user.user_id) {
+        if (!gotUser.isAdmin() && !gotUser.isSelf(req.user.user_id)) {
             return res.status(500).send({
                 status: 'invalid',
                 message: "Alteração não permitida (não é admin ou o utilizador atual)"
@@ -337,6 +336,7 @@ module.exports = () => {
             res.json({
                 status: 'success',
                 message: {
+                    id: currentAccount.id,
                     role: currentAccount.role,
                     name: currentAccount.name, 
                     email: currentAccount.email,
