@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 module.exports = {
     sendEmail: async function (mailTo, subject, content) {
         const mailOptions = {
-            from: 'Rafael Jesus Saraiva <no-reply@rafaeljesusaraiva.pt>', // sender address
+            from: 'Prova Fotografias <no-reply@rafaeljesusaraiva.pt>', // sender address
             to: mailTo, 
             subject: subject, // Subject line
             html: content, // plain text body

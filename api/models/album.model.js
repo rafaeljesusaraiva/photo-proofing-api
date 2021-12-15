@@ -35,9 +35,9 @@ module.exports = mongoose => {
 
     schema.methods.isImageOrWatermark = function (cb) {
         // cb => image ID
-        if (this.images.find(element => element._id == cb)) {
+        if (this.images.includes(cb)) {
             return 'image';
-        } else if (this.watermarked.find(element => element._id == cb)) {
+        } else if (this.watermarked.includes(cb)) {
             return 'watermark'
         } else {
             return false;
@@ -48,7 +48,7 @@ module.exports = mongoose => {
         let local = this;
         try {
             local.images.push(cb._id);
-            local.totalImages = this.totalImages + 1;
+            local.totalImages = local.totalImages + 1;
             await local.save();
         } catch(error) {
             return error;

@@ -96,7 +96,7 @@ module.exports = () => {
             await mail.sendEmail(
                 validClient.email,
                 `[Prova Fotografias] Nova Encomenda #${data.orderCount.toString().padStart(4, '0')}`,
-                `Nova encomenda efetuada. Pode consultar mais informações em: ${process.env.API_URL}/encomendas`
+                `Nova encomenda efetuada. Pode consultar mais informações em: ${process.env.WEB_URL}/encomendas`
             );
             res.send({
                 status: 'success',
@@ -445,7 +445,7 @@ module.exports = () => {
             await mail.sendEmail(
                 currentOrder.client.email,
                 `[Prova Fotografias] Atualização Encomenda #${currentOrder.orderCount.toString().padStart(4, '0')}`,
-                `A sua encomenda #${currentOrder.orderCount.toString().padStart(4, '0')} mudou para "${req.body.orderStatus}". Pode consultar mais informações em: ${process.env.API_URL}/encomendas`
+                `A sua encomenda #${currentOrder.orderCount.toString().padStart(4, '0')} mudou para "${req.body.orderStatus}". Pode consultar mais informações em: ${process.env.WEB_URL}/encomendas`
             );
         }
         if (req.body.promotionCode) {

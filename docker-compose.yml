@@ -19,7 +19,7 @@ services:
       - NODEMAILER_USER=${NODEMAILER_USER}
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
-      - API_URL=${API_URL}
+      - WEB_URL=${WEB_URL}
     network_mode: host
 
 volumes:
