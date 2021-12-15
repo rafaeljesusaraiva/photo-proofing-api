@@ -13,13 +13,6 @@ module.exports = () => {
         // /:slug/:image
         const params = req.params;
 
-        if (req.headers["order-id"] === undefined) {
-            res.status(400).send({ 
-                status: 'error',
-                message: "Falta header order-id", err 
-            })
-        }
-
         let user_id = req.user.user_id;
         let gotUser = await Account.findOne({ _id: user_id });
 
@@ -55,6 +48,12 @@ module.exports = () => {
         let foundOrder = null;
 
         if (!gotUser.isAdmin()) {
+            if (req.headers["order-id"] === undefined) {
+                res.status(400).send({ 
+                    status: 'error',
+                    message: "Falta header order-id" 
+                })
+            }
             // check if is bought (digital or physical)
             foundOrder = await Order.findOne({ _id: req.headers["order-id"], client: user_id })
                                     .populate({ path : 'products.item', populate : { path : 'item' } })
