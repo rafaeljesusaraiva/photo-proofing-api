@@ -49,7 +49,7 @@ module.exports = mongoose => {
         try {
             local.images.push(cb._id);
             local.totalImages = local.totalImages + 1;
-            await local.save();
+            return await local.save();
         } catch(error) {
             return error;
         }
@@ -59,7 +59,7 @@ module.exports = mongoose => {
         let local = this;
         try {
             local.watermarked.push(cb._id);
-            await local.save();
+            return await local.save();
         } catch(error) {
             return error;
         }
