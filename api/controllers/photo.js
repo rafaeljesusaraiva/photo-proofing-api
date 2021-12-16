@@ -34,14 +34,18 @@ module.exports = () => {
                 fs.mkdirSync(albumPath)
             }
 
-            req.files.map(file => {
+            await req.files.map(async file => {
                 let fileToMove = path.join(__basedir, '/public/temp_upload/', file.filename);
                 let fileFinal = path.join(albumPath, file.filename)
-                fs.rename(fileToMove, fileFinal, function (err) {
-                    if (err) {
-                        console.log(err);
-                        throw false;
-                    }
+                
+                await new Promise((resolve) => {
+                    fs.rename(fileToMove, fileFinal, function (err) {
+                        if (err) {
+                            console.log(err);
+                            throw false;
+                        }
+                        resolve();
+                    });
                 });
             })
         
