@@ -294,16 +294,20 @@ module.exports = () => {
             })
 
             // remove folders
-            fs.rmdir(imgPath + data.slug, function(err) {
-                if (err) {
-                    throw err
-                }
-            })
-            fs.rmdir(imgPath + data._id, function(err) {
-                if (err) {
-                    throw err
-                }
-            })
+            if (fs.existsSync(imgPath + data.slug)) {
+                fs.rmdir(imgPath + data.slug, function(err) {
+                    if (err) {
+                        throw err
+                    }
+                })
+            }
+            if (fs.existsSync(imgPath + data._id)) {
+                fs.rmdir(imgPath + data._id, function(err) {
+                    if (err) {
+                        throw err
+                    }
+                })
+            }
 
             res.send({
                 status: 'success',
