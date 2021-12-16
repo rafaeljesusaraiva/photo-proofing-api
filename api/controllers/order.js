@@ -349,7 +349,7 @@ module.exports = () => {
     }
 
     controller.update = async (req, res) => {
-        const allowedFieldsStr = "Allowed fields: note (string), promotionCode (string), addProducts (array), remProducts (array) and orderStatus (string => 'Recebida', 'Por Pagar', 'A Processar', 'Em Entrega', 'Entregue').";
+        const allowedFieldsStr = "Allowed fields: note (string), promotionCode (string), addProducts (array), remProducts (array) and orderStatus (string => 'Recebida - Por Pagar', 'Paga', 'A Processar', 'Em Entrega', 'Entregue').";
 
         // Check if not receiving empty request
         if (Object.keys(req.body).length === 0) {
@@ -494,6 +494,29 @@ module.exports = () => {
                 message: "Could not delete Order with id=" + id
             });
         });
+    };
+
+    controller.process_orders = (req, res) => {
+        const orders = Order.find()
+                            .populate('client')
+                            .populate('promotion')
+                            .populate('payment')
+                            .populate({
+                                path : 'products',
+                                populate : {
+                                    path : 'item',
+                                    populate : { path : 'album' }
+                                }
+                            })
+                            .populate({
+                                path : 'products',
+                                populate : { path : 'size' }
+                            })
+
+        res.status(200).json({
+            status: 'success',
+            message: data
+        })
     };
   
     return controller;
