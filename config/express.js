@@ -7,7 +7,7 @@ const responseTime = require('response-time')
 const influxLogging = require('../api/middleware/influxLogging');
 require('dotenv').config();
 
-var corsOptions = { origin: "*" };
+var corsOptions = { origin: "*", exposedHeaders: '*', credentials: true };
 
 module.exports = () => {
   const app = express();
@@ -32,7 +32,8 @@ module.exports = () => {
   db.mongoose.connect(db.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
   }).then(() => {
     console.log("Connected to the database!");
   }).catch(err => {
@@ -111,6 +112,8 @@ module.exports = () => {
     .then('controllers')
     .then('routes')
     .into(app)
+
+  console.log('DEV VERSION: 1.0.8')
 
   return app;
 };

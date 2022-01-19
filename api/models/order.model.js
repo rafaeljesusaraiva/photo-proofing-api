@@ -1,5 +1,5 @@
 module.exports = mongoose => {
-    const orderPhases = ['Recebida', 'Por Pagar', 'A Processar', 'Em Entrega', 'Entregue', 'Cancelada']
+    const orderPhases = ['Recebida - Por Pagar', 'Paga', 'A Processar', 'Em Entrega', 'Entregue', 'Cancelada']
     const processingIndex = orderPhases.indexOf('A Processar');
 
     var schema = mongoose.Schema(

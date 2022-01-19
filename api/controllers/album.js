@@ -218,13 +218,13 @@ module.exports = () => {
         const { date_event, date_available, date_finalOrder } = req.body;
         let to_update = {};
 
-        if (date_event !== undefined && isDate(date_event)) {
+        if (date_event !== undefined && dayjs(date_event).isValid()) {
             to_update.date_event = new Date(date_event)
         }
-        if (date_available !== undefined && isDate(date_available)) {
+        if (date_available !== undefined && dayjs(date_available).isValid()) {
             to_update.date_available = new Date(date_available)
         }
-        if (date_finalOrder !== undefined && isDate(date_finalOrder)) {
+        if (date_finalOrder !== undefined && dayjs(date_finalOrder).isValid()) {
             to_update.date_finalOrder = new Date(date_finalOrder)
         }
 
@@ -294,16 +294,20 @@ module.exports = () => {
             })
 
             // remove folders
-            fs.rmdir(imgPath + data.slug, function(err) {
-                if (err) {
-                    throw err
-                }
-            })
-            fs.rmdir(imgPath + data._id, function(err) {
-                if (err) {
-                    throw err
-                }
-            })
+            if (fs.existsSync(imgPath + data.slug)) {
+                fs.rmdir(imgPath + data.slug, function(err) {
+                    if (err) {
+                        throw err
+                    }
+                })
+            }
+            if (fs.existsSync(imgPath + data._id)) {
+                fs.rmdir(imgPath + data._id, function(err) {
+                    if (err) {
+                        throw err
+                    }
+                })
+            }
 
             res.send({
                 status: 'success',

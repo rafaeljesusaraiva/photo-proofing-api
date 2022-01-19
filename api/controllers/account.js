@@ -139,7 +139,7 @@ module.exports = () => {
         });
     };
 
-    controller.update = (req, res) => {
+    controller.update = async (req, res) => {
         if (Object.keys(req.body).length === 0) {
             return res.status(400).send({
                 status: 'invalid',
@@ -148,6 +148,14 @@ module.exports = () => {
         }
     
         const id = req.params.id;
+        // Find if Current user is admin or self
+        let gotUser = await Account.findOne({ _id: id });
+        if (!gotUser.isAdmin() && !gotUser.isSelf(req.user.user_id)) {
+            return res.status(500).send({
+                status: 'invalid',
+                message: "Alteração não permitida (não é admin ou o utilizador atual)"
+            });
+        }
     
         Account.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
         .then(data => {
@@ -253,7 +261,7 @@ module.exports = () => {
         await mail.sendEmail(
             req.body.email,
             '[Prova Fotografias] Repor palavra-passe',
-            `Se não pretende alterar a sua palavra-passe, ignore este email. Caso contrário, o link é válido por 30 minutos. (Até às ${dayjs(validationObject.validUntil).format('HH:mm [de] DD/MM/YYYY')}) <br/><br/> ${process.env.API_URL}/alterar-password?token=`+validationObject.token
+            `Se não pretende alterar a sua palavra-passe, ignore este email. Caso contrário, o link é válido por 30 minutos. (Até às ${dayjs(validationObject.validUntil).format('HH:mm [de] DD/MM/YYYY')}) <br/><br/> ${process.env.WEB_URL}/alterar-password?token=`+validationObject.token
         )
 
         res.send({ 
@@ -328,6 +336,7 @@ module.exports = () => {
             res.json({
                 status: 'success',
                 message: {
+                    id: currentAccount.id,
                     role: currentAccount.role,
                     name: currentAccount.name, 
                     email: currentAccount.email,

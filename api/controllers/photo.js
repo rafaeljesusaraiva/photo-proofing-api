@@ -15,22 +15,37 @@ module.exports = () => {
 
             let album = await Album.findOne({ _id: req.body.albumId }).then(albumObj => { return albumObj }).catch(err => { return err; });
 
+            let reqWatermark = (req.body.watermark.toLowerCase() === 'true')
+
             // Final location folder
-            let albumPath = `${__basedir}/public/${req.body.watermark ? 'album_watermarked' : 'album_delivery'}/${album.slug}/`;
+            let albumPath = `${__basedir}/public/${reqWatermark ? 'album_watermarked' : 'album_delivery'}/${album.slug}/`;
+
+            // Check if Base Folders exist
+            if (!fs.existsSync(`${__basedir}/public/album_delivery/`)) {
+                fs.mkdirSync(`${__basedir}/public/album_delivery/`)
+            }
+
+            if (!fs.existsSync(`${__basedir}/public/album_watermarked/`)) {
+                fs.mkdirSync(`${__basedir}/public/album_watermarked/`)
+            }
 
             // Check if Final Location exists, if not create
             if (!fs.existsSync(albumPath)) {
                 fs.mkdirSync(albumPath)
             }
 
-            req.files.map(file => {
+            await req.files.map(async file => {
                 let fileToMove = path.join(__basedir, '/public/temp_upload/', file.filename);
                 let fileFinal = path.join(albumPath, file.filename)
-                fs.rename(fileToMove, fileFinal, function (err) {
-                    if (err) {
-                        console.log(err);
-                        throw false;
-                    }
+                
+                await new Promise((resolve) => {
+                    fs.rename(fileToMove, fileFinal, function (err) {
+                        if (err) {
+                            console.log(err);
+                            throw false;
+                        }
+                        resolve();
+                    });
                 });
             })
         
@@ -69,6 +84,7 @@ module.exports = () => {
         }
 
         let uploadedFilesObj = [];
+        let reqWatermark = (req.body.watermark.toLowerCase() === 'true')
 
         req.files.map(file => {
             uploadedFilesObj.push(
@@ -80,10 +96,10 @@ module.exports = () => {
         })
 
         await Album.findOne({ _id: req.body.albumId }).then(albumObj => {
-            if (!req.body.watermark) {
-                uploadedFilesObj.map(singlePhoto => {
-                    albumObj.addImage(singlePhoto);
-                    singlePhoto.save(singlePhoto).catch(err => {
+            if (!reqWatermark) {
+                uploadedFilesObj.map(async singlePhoto => {
+                    await albumObj.addImage(singlePhoto);
+                    await singlePhoto.save(singlePhoto).catch(err => {
                         res.status(500).send({
                             message:
                             err.message || "Some error occurred while creating the photo in DB."
@@ -91,9 +107,9 @@ module.exports = () => {
                     })
                 })
             } else {
-                uploadedFilesObj.map(singlePhoto => {
-                    albumObj.addWatermarked(singlePhoto);
-                    singlePhoto.save(singlePhoto).catch(err => {
+                uploadedFilesObj.map(async singlePhoto => {
+                    await albumObj.addWatermarked(singlePhoto);
+                    await singlePhoto.save(singlePhoto).catch(err => {
                         res.status(500).send({
                             message:
                             err.message || "Some error occurred while creating the photo in DB."
@@ -174,12 +190,13 @@ module.exports = () => {
                 });
             } else {
                 Album.findOne({ _id: data.album }).then(albumObj => {
-                    albumObj.removeImage({_id: data.id});
-
                     let imgPath = __basedir + "/public/album";
-                    if (albumObj.isImageOrWatermark(data._id) == 'image') {
+                    let imageType = albumObj.isImageOrWatermark(data._id);
+                    if (imageType == 'image') {
+                        albumObj.removeImage({_id: id});
                         imgPath += `_delivery/${albumObj.slug}/${data.filename}`;
-                    } else if (albumObj.isImageOrWatermark(data._id) == 'watermark') {
+                    } else if (imageType == 'watermark') {
+                        albumObj.removeWatermarked({_id: id});
                         imgPath += `_watermarked/${albumObj.slug}/${data.filename}`;
                     } else {
                         res.status(404).send({

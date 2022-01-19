@@ -35,24 +35,34 @@ module.exports = mongoose => {
 
     schema.methods.isImageOrWatermark = function (cb) {
         // cb => image ID
-        if (this.images.find(element => element._id == cb)) {
+        if (this.images.includes(cb)) {
             return 'image';
-        } else if (this.watermarked.find(element => element._id == cb)) {
+        } else if (this.watermarked.includes(cb)) {
             return 'watermark'
         } else {
             return false;
         }
     }
 
-    schema.methods.addImage = function (cb) {
-        this.images.push(cb._id);
-        this.totalImages = this.totalImages + 1;
-        this.save();
+    schema.methods.addImage = async function (cb) {
+        let local = this;
+        try {
+            local.images.push(cb._id);
+            local.totalImages = local.totalImages + 1;
+            return await local.save();
+        } catch(error) {
+            return error;
+        }
     }
 
-    schema.methods.addWatermarked = function (cb) {
-        this.watermarked.push(cb._id);
-        this.save();
+    schema.methods.addWatermarked = async function (cb) {
+        let local = this;
+        try {
+            local.watermarked.push(cb._id);
+            return await local.save();
+        } catch(error) {
+            return error;
+        }
     }
 
     schema.methods.removeImage = function (cb) {
