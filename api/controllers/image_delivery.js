@@ -13,6 +13,13 @@ module.exports = () => {
         // /:slug/:image
         const params = req.params;
 
+        if (req.headers["order-id"] === undefined) {
+            res.status(400).send({ 
+                status: 'error',
+                message: "Falta header order-id"
+            })
+        }
+
         let user_id = req.user.user_id;
         let gotUser = await Account.findOne({ _id: user_id });
 
@@ -32,12 +39,14 @@ module.exports = () => {
         // check if image in album
         let foundImageInAlbum = false;
         try {
-            album.images.map((image, imageIndex) => {
-                if (image.filename === params.image) {
-                    foundImageInAlbum = { image: image, watermark: album.watermarked[imageIndex] };
+            for (let imageIndex = 0; imageIndex < album.watermarked.length; imageIndex++) {
+                const image = album.watermarked[imageIndex];
+                if (image.filename === params.image){
+                    foundImageInAlbum = { watermark: image, image: album.images[imageIndex] };
+                    break;
                 }
-            })
-            if (foundImageInAlbum === false) throw 'Imagem não encontrada.'
+            }
+            if (!foundImageInAlbum) throw 'Imagem não encontrada.'
         } catch (error) {
             res.status(400).send({ 
                 status: 'error',
@@ -65,7 +74,6 @@ module.exports = () => {
                                         // loop products from order and check if matches with requested image
                                         // summing up, if user ordered the image
                                         responseProducts.forEach(element => {
-                                            console.log(element)
                                             if (element.item.equals(foundImageInAlbum.watermark)) 
                                                 titem = true;
                                         });
@@ -85,11 +93,11 @@ module.exports = () => {
 
         // send response
         if (gotUser.isAdmin() || foundOrder.canDeliverDigital()) {
-            res.sendFile(`${__basedir}/public/album_delivery/${album.slug}/${params.image}`)
+            res.sendFile(`${__basedir}/public/album_delivery/${album.slug}/${foundImageInAlbum.image.filename}`)
         } else {
             res.status(400).send({ 
                 status: 'error',
-                message: "Cliente não adquiriu a imagem pedida!", err 
+                message: "Cliente não adquiriu a imagem pedida!"
             })
         }
     };
@@ -115,7 +123,12 @@ module.exports = () => {
                                     path : 'products', 
                                     populate : { 
                                         path : 'item',
-                                        populate: { path: 'album' }
+                                        populate: { 
+                                            path: 'album',
+                                            populate: {
+                                                path: 'images watermarked'
+                                            }
+                                        }
                                     } 
                                 })
                                 .populate({ 
@@ -144,19 +157,29 @@ module.exports = () => {
         })
 
         let tempList = [];
+        let tCount = 0;
         productList.forEach(product => {
-            let tImage = product.item;
             let tAlbum = product.item.album;
-            let tCount = 0;
-            let tWatermarked = product.item.album.watermarked;
-            tWatermarked.every((elem, index) => (elem.toString() === (product.item._id).toString()) ? (tCount = index+1) : "")
+            tCount += 1;
+            let albumList = {
+                watermarked: product.item.album.watermarked,
+                original: product.item.album.images
+            }
+            let noWatermarkImage = "";
+            for (let imageIndex = 0; imageIndex < albumList.watermarked.length; imageIndex++) {
+                const image = albumList.watermarked[imageIndex];
+                if (image.filename === product.item.filename){
+                    noWatermarkImage = albumList.original[imageIndex];
+                    break;
+                }
+            }
             tempList.push({
                 name: `encomenda${order.orderCount.toString().padStart(4, '0')}-${product.item.album.slug.replace(/-/g, "_")}-${tCount.toString().padStart(4, '0')}.jpg`,
-                dir: `${__basedir}/public/album_delivery/${tAlbum.slug}/${tImage.filename}`
+                dir: `${__basedir}/public/album_delivery/${tAlbum.slug}/${noWatermarkImage.filename}`
             });
         })
 
-        console.log(tempList)
+        // console.log(tempList)
 
         const archive = archiver('zip', { zlib: { level: 9 } });
 
