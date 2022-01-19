@@ -26,4 +26,5 @@ package-lock.json
 *.log
 *.gz
 
+/public
 /public/**
