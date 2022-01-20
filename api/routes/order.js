@@ -15,6 +15,7 @@ module.exports = app => {
   app.route('/order/stats').get(auth.isAdmin, controller.stats_admin);
   // Get Order Info for processing (admin)
   app.route('/order/process_orders').get(auth.isAdmin, controller.process_orders);
+  app.route('/order/process_orders_zip').get(auth.isAdmin, controller.process_orders_zip);
 
   // Get One Order (admin)
   app.route('/order/:id').get(auth.isAdmin, controller.findOne_admin);

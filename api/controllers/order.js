@@ -7,7 +7,8 @@ const PhotoSize = require("../models").photo_size;
 var dayjs = require('dayjs');
 const mail = require('../extra/mail');
 const utils = require('../extra/utils');
-var xl = require('excel4node');
+const archiver = require('archiver');
+const fs = require('fs');
 
 module.exports = () => {
     const controller = {};
@@ -510,103 +511,89 @@ module.exports = () => {
                                     path : 'item',
                                     populate : { 
                                         path : 'album',
-                                        select: 'title'
+                                        select: 'title slug',
+                                        populate: {
+                                            path: 'images watermarked'
+                                        }
                                     }
                                 }
                             })
                             .populate('products.size', 'size')
 
-        // Get List of Photos to Print [{ album: $string, filename: $string, quantity: $integer }, ...]
-        let PrintList = [];
+        let processedInfo = await utils.processDataToExcel(orders);
+        let OrderList = processedInfo.OrderList;
+        let PrintList = processedInfo.PrintList;
+        let PrintTotal = processedInfo.PrintTotal;
+        
+        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal);
 
-        // Get List of Orders [{ cliente: $string, tel: $integer, email: $string, items: [{ album: $string, filename: $string, quantity: $integer }, ...] }, ...]
-        let OrderList = [];
-
-        for (const singleOrder of orders) {
-            //
-            // Fill PrintList
-            //
-            // Function to condense 'currentOrder_photoList' into array with photo info and quantity
-            console.log(singleOrder)
-            const currentOrder_photoList = utils.condense_photoList(singleOrder.products);
-            // Go through 'currentOrder_photoList'
-            for (const singlePhoto of currentOrder_photoList) {
-                // Check if images exists, if not add to 'PrintList', else increase quantity count
-                let exists = utils.existsIn_printList(PrintList, singlePhoto);
-                if (exists === false) {
-                    PrintList.push(singlePhoto)
-                } else {
-                    PrintList[exists].quantity += singlePhoto.quantity;
-                }
+        async function waitForWrite(){
+            let filesize = (await fs.promises.stat(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`)).size
+            if(filesize < 100){
+                setTimeout(waitForWrite, 250);
             }
-
-            //
-            // Fill OrderList
-            //
-            
         }
+        waitForWrite();
 
-        // Create Excel File
-        var OrderSummary = new xl.Workbook({
-            author: 'Aplicação de Provas - Rafael de Jesus Saraiva',
-            jszip: {
-                compression: 'DEFLATE',
-            },
+        const excelFileName = `resumo_encomendas_porProcessar_${dayjs().format('YYYY_MMM_DD-HH_mm_ss')}.xlsx`;
+        res.setHeader("Content-Disposition", "attachment; filename=" + excelFileName);
+        return res.sendFile(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`, function (err) {
+            if (err) {
+                next(err);
+            }
         });
+    };
 
-        // Add Two Worksheets
-        var PrintingSheet = OrderSummary.addWorksheet('Lista Impressões');
-        var OrderSheet = OrderSummary.addWorksheet('Lista Encomendas');
+    controller.process_orders_zip = async (req, res) => {
+        // Get All Orders
+        const orders = await Order.find()
+                            .populate('client')
+                            .populate('promotion')
+                            .populate('payment')
+                            .populate({
+                                path : 'products',
+                                populate : {
+                                    path : 'item',
+                                    populate : { 
+                                        path : 'album',
+                                        select: 'title slug',
+                                        populate: {
+                                            path: 'images watermarked'
+                                        }
+                                    }
+                                }
+                            })
+                            .populate('products.size', 'size')
 
-        // Cell Styles
-        var TitleStyle = OrderSummary.createStyle({ font: { color: '#000000', size: 16 } });
-        var HeaderStyle = OrderSummary.createStyle({
-            font: { color: '#000000', size: 12, bold: true },
-            alignment: { wrapText: true, shrinkToFit: true }
-        });
-        var CellStyle = OrderSummary.createStyle({
-            font: { color: '#000000', size: 12 },
-            alignment: { wrapText: true, shrinkToFit: true }
-        });
+        let processedInfo = await utils.processDataToExcel(orders);
+        let OrderList = processedInfo.OrderList;
+        let PrintList = processedInfo.PrintList;
+        let PrintTotal = processedInfo.PrintTotal;
 
-        //
-        // Add Data to First Worksheet
-        //
-        // Worksheet Title
-        PrintingSheet.cell(1, 1, 1, 6, true)
-                        .string('Lista Fotografias a Imprimir - Total: ' + PrintList.length)
-                        .style(TitleStyle);
+        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal);
 
-        // Worksheet Table Headers
-        PrintingSheet.cell(3, 1).string('Evento').style(HeaderStyle);
-        PrintingSheet.cell(3, 2).string('Nome Ficheiro').style(HeaderStyle);
-        PrintingSheet.cell(3, 3).string('Quantidade').style(HeaderStyle);
-        PrintingSheet.column(1).setWidth(25);
-        PrintingSheet.column(2).setWidth(25);
-        PrintingSheet.column(3).setWidth(15);
+        async function waitForWrite(){
+            let filesize = (await fs.promises.stat(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`)).size
+            if(filesize < 100){
+                setTimeout(waitForWrite, 250);
+            }
+        }
+        waitForWrite();
 
-        // Worksheet Data
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        res.attachment(`resumo_encomendas_porProcessar_${dayjs().format('YYYY_MMM_DD-HH_mm_ss')}.zip`)
+        archive.pipe(res);
 
-        //
-        // Add Data to First Worksheet
-        //
-        // Worksheet Title
-        OrderSheet.cell(1, 1, 1, 6, true)
-                    .string('Lista Encomendas a Processar - Total: ' + OrderList.length)
-                    .style(TitleStyle);
-        OrderSheet.column(1).setWidth(25);
-        OrderSheet.column(2).setWidth(25);
-        OrderSheet.column(3).setWidth(25);
-        OrderSheet.column(4).setWidth(25);
-
-        // Worksheet Data
-
-        //
-        // Send Excel as response
-        //
-        const filename = `Relatorio-Encomendas-${dayjs().format('YYYY_MMM_DD-HH_mm_ss')}.xlsx`;
-        res.setHeader("Content-Disposition", "attachment; filename=" + filename);
-        await OrderSummary.write(filename, res);
+        PrintList.forEach(printing => {
+            let filepath = `${__basedir}/public/album_delivery/${printing.album_slug}/${printing.filename}`;
+            for (let repeat = 0; repeat < printing.quantity; repeat++) {
+                archive.file(filepath, { name: '/fotografias_imprimir/'+repeat+'_'+printing.filename });
+            }
+        })
+        archive.append(fs.createReadStream(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`), { name: 'Relatorio-Encomendas.xlsx' });
+        
+        archive.finalize();
+        return;
     };
   
     return controller;
