@@ -113,7 +113,7 @@ module.exports = () => {
     .then('routes')
     .into(app)
 
-  console.log('DEV VERSION: 1.2.2')
+  console.log('DEV VERSION: 1.2.4')
 
   return app;
 };
