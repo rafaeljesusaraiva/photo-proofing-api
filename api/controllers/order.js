@@ -524,8 +524,24 @@ module.exports = () => {
         let OrderList = processedInfo.OrderList;
         let PrintList = processedInfo.PrintList;
         let PrintTotal = processedInfo.PrintTotal;
+
+        const photoSizes = await PhotoSize.find();
+        if(!photoSizes) {
+            return res.status(404).json({
+                status: 'error',
+                message:'Could not retrieve photoSizes'
+            })
+        }
+        let simpleSizes = {};
+        photoSizes.forEach(singleSize => {
+            let costs = {}, costList = singleSize.costVariations;
+            costList.forEach(singleCost => {
+                costs[singleCost.minimumQuantity] = singleCost.price;
+            })
+            simpleSizes[singleSize.size] = costs;
+        })
         
-        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal);
+        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal, simpleSizes);
 
         async function waitForWrite(){
             let filesize = (await fs.promises.stat(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`)).size
@@ -570,7 +586,23 @@ module.exports = () => {
         let PrintList = processedInfo.PrintList;
         let PrintTotal = processedInfo.PrintTotal;
 
-        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal);
+        const photoSizes = await PhotoSize.find();
+        if(!photoSizes) {
+            return res.status(404).json({
+                status: 'error',
+                message:'Could not retrieve photoSizes'
+            })
+        }
+        let simpleSizes = {};
+        photoSizes.forEach(singleSize => {
+            let costs = {}, costList = singleSize.costVariations;
+            costList.forEach(singleCost => {
+                costs[singleCost.minimumQuantity] = singleCost.price;
+            })
+            simpleSizes[singleSize.size] = costs;
+        })
+
+        await utils.generateProcessingExcel(OrderList, PrintList, PrintTotal, simpleSizes);
 
         async function waitForWrite(){
             let filesize = (await fs.promises.stat(`${__basedir}/public/temp_upload/Relatorio-Encomendas.xlsx`)).size

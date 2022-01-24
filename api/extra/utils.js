@@ -3,7 +3,7 @@ var xl = require('excel4node');
 
 module.exports = {
     condense_photoList: function (array) {
-        let newArray = [], tSingleProduct = {};
+        let newArray = [], tSingleProduct = null;
 
         for (const [index, element] of array.entries()) {
             // Percorrer a lista de fotos
@@ -21,18 +21,8 @@ module.exports = {
                 }
             }
 
-            // Se primeira foto, guardar em objeto temporário
-            if (index === 0) {
-                tSingleProduct = {
-                    album: albumObj.title,
-                    album_slug: albumObj.slug,
-                    filename: noWatermarkImage,
-                    watermark: watermarkImage,
-                    size: sizeName,
-                    quantity: 1
-                }
-            } else {
-                // Comparar com objeto temporário
+            if (tSingleProduct !== null) {
+                // Comparar com objeto temporário (caso exista)
                 // Se igual, incrementar
                 if (albumObj.slug === tSingleProduct.album_slug && watermarkImage === tSingleProduct.watermark && sizeName === tSingleProduct.size) {
                     tSingleProduct.quantity++;
@@ -50,8 +40,18 @@ module.exports = {
                         quantity: 1
                     }
                 }
+            } else {
+                // Se primeira foto, guardar em objeto temporário
+                tSingleProduct = {
+                    album: albumObj.title,
+                    album_slug: albumObj.slug,
+                    filename: noWatermarkImage,
+                    watermark: watermarkImage,
+                    size: sizeName,
+                    quantity: 1
+                }
             }
-            
+
             // Caso seja último elemento do input, adicionar temporario a array
             if (index === array.length - 1) {
                 newArray.push(tSingleProduct);
@@ -150,7 +150,7 @@ module.exports = {
             PrintTotal: PrintTotal
         }
     },
-    generateProcessingExcel: async function (OrderList, PrintList, PrintTotal){
+    generateProcessingExcel: async function (OrderList, PrintList, PrintTotal, photoSizes){
         // Create Excel File
         var OrderSummary = new xl.Workbook({
             author: 'Aplicação de Provas - Rafael de Jesus Saraiva',
@@ -178,26 +178,87 @@ module.exports = {
             alignment: { wrapText: true, shrinkToFit: true, horizontal: 'left' }
         });
 
+        let printRow = 1;
+
         //
         // Add Data to First Worksheet
         //
         // Worksheet Title
-        PrintingSheet.cell(1, 1, 1, 6, true)
+        PrintingSheet.cell(printRow, 1, 1, 6, true)
                         .string('Lista Fotografias a Imprimir - Total: ' + PrintTotal)
                         .style(TitleStyle);
+        printRow += 2;
+
+        //
+        // Show costs and print stats
+        //
+        // Show printing cost for each size and quantity
+        PrintingSheet.cell(printRow, 1).string('Tamanho => Quantidade => Total').style(HeaderStyle2);
+        printRow++;
+        //// Gather data
+        let printingCosts = [];
+        for (let printIndex = 0; printIndex < PrintList.length; printIndex++) {
+            if (PrintList[printIndex].size in printingCosts) {
+                printingCosts[PrintList[printIndex].size].quantity += PrintList[printIndex].quantity;
+            } else {
+                printingCosts[PrintList[printIndex].size] = {};
+                printingCosts[PrintList[printIndex].size].quantity = PrintList[printIndex].quantity;
+            }
+        }
+        //// Show data
+        let printingFinalCost = 0;
+        for (var sizeKey in printingCosts) {
+            if (sizeKey === 'length' || !printingCosts.hasOwnProperty(sizeKey)) continue;
+            var quantity = printingCosts[sizeKey].quantity;
+            // console.log(sizeKey, quantity)
+            // sizeKey => nome tamanho pedido
+            // quantity => quantidade tamanho pedido
+            
+            let matchedSize = photoSizes[sizeKey], priceToPay = 0;
+            // console.log(matchedSize)
+            // matchedSize => objeto com info do tamanho pedido
+
+            for (var msQty in matchedSize) {
+                if (msQty === 'length' || !matchedSize.hasOwnProperty(msQty)) continue;
+                var msPrice = matchedSize[msQty];
+                // msQty => numero de quantidade minima
+                // msPrice => custo de quantidade minima
+
+                if (quantity > parseInt(msQty)) {
+                    priceToPay = msPrice;
+                } else {
+                    break;
+                }
+            }
+            printingFinalCost += quantity * priceToPay;
+            printingCosts[sizeKey].cost = (quantity * priceToPay).toFixed(2) + "€";
+            printingCosts[sizeKey].size = sizeKey;
+            // console.log(`${sizeKey} cost for ${quantity} photos is ${totalCost}€, where the price per photo is ${priceToPay}`)
+        }
+        for (var sizeKey in printingCosts) {
+            PrintingSheet.cell(printRow, 1).style(CellStyle).string(`O tamanho "${printingCosts[sizeKey].size}" tem ${printingCosts[sizeKey].quantity} fotografias que ficam a ${printingCosts[sizeKey].cost}.`);
+            printRow++;
+        }
+        printRow++;
+        
+        // Show final print cost
+        PrintingSheet.cell(printRow, 1).style(CellStyle).string(`Custo de Impressão: ${printingFinalCost}€`);
+        printRow += 2;
+        console.log(printingCosts)
 
         // Worksheet Table Headers
-        PrintingSheet.cell(3, 1).string('Evento').style(HeaderStyle2);
-        PrintingSheet.cell(3, 2).string('Nome Ficheiro').style(HeaderStyle2);
-        PrintingSheet.cell(3, 3).string('Tamanho').style(HeaderStyle2);
-        PrintingSheet.cell(3, 4).string('Quantidade').style(HeaderStyle2);
+        PrintingSheet.cell(printRow, 1).string('Evento').style(HeaderStyle2);
+        PrintingSheet.cell(printRow, 2).string('Nome Ficheiro').style(HeaderStyle2);
+        PrintingSheet.cell(printRow, 3).string('Tamanho').style(HeaderStyle2);
+        PrintingSheet.cell(printRow, 4).string('Quantidade').style(HeaderStyle2);
         PrintingSheet.column(1).setWidth(35);
         PrintingSheet.column(2).setWidth(53);
         PrintingSheet.column(3).setWidth(15);
         PrintingSheet.column(4).setWidth(15);
+        printRow++;
 
         // Worksheet Data
-        for (let printIndex = 0, printRow = 4; printIndex < PrintList.length; printIndex++, printRow++) {
+        for (let printIndex = 0; printIndex < PrintList.length; printIndex++, printRow++) {
             PrintingSheet.cell(printRow, 1).style(CellStyle).string(PrintList[printIndex].album);
             PrintingSheet.cell(printRow, 2).style(CellStyle).string(PrintList[printIndex].filename);
             PrintingSheet.cell(printRow, 3).style(CellStyle).string(PrintList[printIndex].size);
