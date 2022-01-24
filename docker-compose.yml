@@ -76,7 +76,7 @@ services:
       - rafaeljesusaraiva-api-02
       - rafaeljesusaraiva-api-03
     ports:
-      - "8005:8005"
+      - "8009:8009"
     network_mode: host
 
 volumes:
