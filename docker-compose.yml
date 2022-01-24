@@ -1,14 +1,12 @@
 version: '3'
 services:
-  rafaeljesusaraiva-api-01:
+  rafaeljesusaraiva-api:
     build:
       context: ./
       dockerfile: Dockerfile
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    expose:
-      - 8010
     ports:
      - "8010:8010"
     environment:
@@ -23,6 +21,27 @@ services:
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
     network_mode: host
+
+  rafaeljesusaraiva-api-01:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: rafaeljesusaraiva-api/latest
+    volumes:
+      - saruman-docker-data:/saruman-data
+    expose:
+      - 8010
+    environment:
+      - TOKEN_KEY=${TOKEN_KEY}
+      - INFLUXDB_HOST=${INFLUXDB_HOST}
+      - INFLUXDB_PORT=${INFLUXDB_PORT}
+      - INFLUXDB_DBNAME=${INFLUXDB_DBNAME}
+      - NODEMAILER_HOST=${NODEMAILER_HOST}
+      - NODEMAILER_PORT=${NODEMAILER_PORT}
+      - NODEMAILER_USER=${NODEMAILER_USER}
+      - NODEMAILER_PASS=${NODEMAILER_PASS}
+      - PORT=${PORT}
+      - WEB_URL=${WEB_URL}
 
   rafaeljesusaraiva-api-02:
     build:
