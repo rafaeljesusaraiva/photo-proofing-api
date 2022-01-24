@@ -83,8 +83,6 @@ services:
     build:
       context: ./load-balancer
       dockerfile: Dockerfile
-    volumes:
-      - saruman-docker-data:/saruman-data
     links:
         - api_main-01
         - api_main-02
