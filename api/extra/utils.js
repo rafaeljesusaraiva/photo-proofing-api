@@ -244,7 +244,6 @@ module.exports = {
         // Show final print cost
         PrintingSheet.cell(printRow, 1).style(CellStyle).string(`Custo de Impressão: ${printingFinalCost}€`);
         printRow += 2;
-        console.log(printingCosts)
 
         // Worksheet Table Headers
         PrintingSheet.cell(printRow, 1).string('Evento').style(HeaderStyle2);
