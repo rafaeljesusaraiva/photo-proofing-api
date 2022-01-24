@@ -4,6 +4,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    hostname: api_main-00
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
