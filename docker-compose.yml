@@ -1,6 +1,6 @@
 version: '3'
 services:
-  rafaeljesusaraiva-api:
+  api_main:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -22,7 +22,7 @@ services:
       - WEB_URL=${WEB_URL}
     network_mode: host
 
-  rafaeljesusaraiva-api-01:
+  api_main-01:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -43,7 +43,7 @@ services:
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
 
-  rafaeljesusaraiva-api-02:
+  api_main-02:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -67,7 +67,7 @@ services:
       - WEB_URL=${WEB_URL}
     #network_mode: host
 
-  rafaeljesusaraiva-api-03:
+  api_main-03:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -98,9 +98,9 @@ services:
       - haproxy:/haproxy-override
     command: sh -c "cp /saruman-data/haproxy-api/haproxy.cfg /haproxy-override/haproxy.cfg"
     links:
-      - rafaeljesusaraiva-api-01
-      - rafaeljesusaraiva-api-02
-      - rafaeljesusaraiva-api-03
+      - api_main-01
+      - api_main-02
+      - api_main-03
     ports:
       - "8009:8009"
     expose:
