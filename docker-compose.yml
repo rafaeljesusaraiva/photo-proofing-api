@@ -29,8 +29,6 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    expose:
-      - 8010
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -50,10 +48,6 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    expose:
-      - 8010
-    #ports:
-    #  - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -65,7 +59,6 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    #network_mode: host
 
   api_main-03:
     build:
@@ -74,10 +67,6 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    expose:
-      - 8010
-    #ports:
-    #  - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -89,26 +78,22 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    #network_mode: host
 
-  haproxy:
-    image: hypriot/rpi-haproxy
+  loadbalancer:
+    build:
+      context: ./load-balancer
+      dockerfile: Dockerfile
     volumes:
       - saruman-docker-data:/saruman-data
-      - haproxy:/haproxy-override
-    command: sh -c "cp /saruman-data/haproxy-api/haproxy.cfg /haproxy-override/haproxy.cfg"
     links:
-      - api_main-01
-      - api_main-02
-      - api_main-03
+        - api_main-01
+        - api_main-02
+        - api_main-03
     ports:
-      - "8009:8009"
-    expose:
-      - "8009"
+        - '8011:8011'
 
 volumes:
   saruman-docker-data:
     external: true
     name: saruman-docker
-  haproxy:
     
