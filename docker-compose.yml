@@ -81,3 +81,5 @@ volumes:
   saruman-docker-data:
     external: true
     name: saruman-docker
+  haproxy:
+    
