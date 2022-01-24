@@ -20,7 +20,7 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    network_mode: host
+    #network_mode: host
 
   rafaeljesusaraiva-api-02:
     build:
@@ -42,7 +42,7 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    network_mode: host
+    #network_mode: host
 
   rafaeljesusaraiva-api-03:
     build:
@@ -64,7 +64,7 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    network_mode: host
+    #network_mode: host
 
   haproxy:
     image: hypriot/rpi-haproxy
@@ -77,6 +77,7 @@ services:
       - rafaeljesusaraiva-api-03
     ports:
       - "8005:8005"
+    network_mode: host
 
 volumes:
   saruman-docker-data:
