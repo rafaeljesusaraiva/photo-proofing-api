@@ -69,7 +69,8 @@ services:
   haproxy:
     image: hypriot/rpi-haproxy
     volumes:
-      - saruman-docker-data/haproxy:/haproxy-override
+      - saruman-docker-data:/saruman-data
+    command: bash -c "mkdir /haproxy-override; cp /saruman-data/haproxy-api/haproxy.cfg /haproxy-override/haproxy.cfg"
     links:
       - rafaeljesusaraiva-api-01
       - rafaeljesusaraiva-api-02
