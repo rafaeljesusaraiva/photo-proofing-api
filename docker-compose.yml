@@ -81,8 +81,8 @@ services:
 
   loadbalancer:
     build:
-      context: ./load-balancer
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./load-balancer/Dockerfile
     links:
         - api_main-01
         - api_main-02
