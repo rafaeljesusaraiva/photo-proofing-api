@@ -4,6 +4,8 @@ services:
     image: jwilder/nginx-proxy:latest
     volumes:
       - //var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DEFAULT_HOST=api-provas.rafaeljesusaraiva.pt
     ports:
       - "8005:8005"  
 
@@ -27,6 +29,7 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
+      - VIRTUAL_HOST=api-provas.rafaeljesusaraiva.pt
     network_mode: host
 
 volumes:
