@@ -1,6 +1,4 @@
 FROM nginx:stable-alpine 
-WORKDIR /
-RUN cp -f /saruman-data/rafaeljesusaraiva-api-loadbalancer/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 8011
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off", "-c", "/saruman-data/rafaeljesusaraiva-api-loadbalancer/nginx.conf"]
