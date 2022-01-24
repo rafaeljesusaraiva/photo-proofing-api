@@ -79,18 +79,18 @@ services:
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
 
-  loadbalancer:
-    build:
-      context: ./load-balancer
-      dockerfile: Dockerfile
-    volumes:
-      - saruman-docker-data:/saruman-data
-    links:
-        - api_main-01
-        - api_main-02
-        - api_main-03
-    ports:
-        - '8011:8011'
+  # loadbalancer:
+  #   build:
+  #     context: ./load-balancer
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - saruman-docker-data:/saruman-data
+  #   links:
+  #       - api_main-01
+  #       - api_main-02
+  #       - api_main-03
+  #   ports:
+  #       - '8011:8011'
 
 volumes:
   saruman-docker-data:
