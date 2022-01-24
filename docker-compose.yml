@@ -1,15 +1,6 @@
 version: '3'
 services:
-  nginix-loadbalancer:
-    image: jwilder/nginx-proxy:latest
-    volumes:
-      - //var/run/docker.sock:/tmp/docker.sock:ro
-    environment:
-      - DEFAULT_HOST=api-provas.rafaeljesusaraiva.pt
-    ports:
-      - "8005:8005"  
-
-  rafaeljesusaraiva-api:
+  rafaeljesusaraiva-api-01:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -29,8 +20,62 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-      - VIRTUAL_HOST=api-provas.rafaeljesusaraiva.pt
     network_mode: host
+
+  rafaeljesusaraiva-api-02:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: rafaeljesusaraiva-api/latest
+    volumes:
+      - saruman-docker-data:/saruman-data
+    ports:
+      - "8010:8010"
+    environment:
+      - TOKEN_KEY=${TOKEN_KEY}
+      - INFLUXDB_HOST=${INFLUXDB_HOST}
+      - INFLUXDB_PORT=${INFLUXDB_PORT}
+      - INFLUXDB_DBNAME=${INFLUXDB_DBNAME}
+      - NODEMAILER_HOST=${NODEMAILER_HOST}
+      - NODEMAILER_PORT=${NODEMAILER_PORT}
+      - NODEMAILER_USER=${NODEMAILER_USER}
+      - NODEMAILER_PASS=${NODEMAILER_PASS}
+      - PORT=${PORT}
+      - WEB_URL=${WEB_URL}
+    network_mode: host
+
+  rafaeljesusaraiva-api-03:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: rafaeljesusaraiva-api/latest
+    volumes:
+      - saruman-docker-data:/saruman-data
+    ports:
+      - "8010:8010"
+    environment:
+      - TOKEN_KEY=${TOKEN_KEY}
+      - INFLUXDB_HOST=${INFLUXDB_HOST}
+      - INFLUXDB_PORT=${INFLUXDB_PORT}
+      - INFLUXDB_DBNAME=${INFLUXDB_DBNAME}
+      - NODEMAILER_HOST=${NODEMAILER_HOST}
+      - NODEMAILER_PORT=${NODEMAILER_PORT}
+      - NODEMAILER_USER=${NODEMAILER_USER}
+      - NODEMAILER_PASS=${NODEMAILER_PASS}
+      - PORT=${PORT}
+      - WEB_URL=${WEB_URL}
+    network_mode: host
+
+  haproxy:
+    image: hypriot/rpi-haproxy
+    volumes:
+      - haproxy:/haproxy-override
+    links:
+      - rafaeljesusaraiva-api-01
+      - rafaeljesusaraiva-api-02
+      - rafaeljesusaraiva-api-03
+    ports:
+      - "8005:8005"
 
 volumes:
   saruman-docker-data:
