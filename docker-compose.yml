@@ -28,6 +28,8 @@ services:
       context: ./
       dockerfile: Dockerfile
     hostname: api_main-01
+    expose:
+      - "8010"
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
@@ -48,6 +50,8 @@ services:
       context: ./
       dockerfile: Dockerfile
     hostname: api_main-02
+    expose:
+      - "8010"
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
@@ -68,6 +72,8 @@ services:
       context: ./
       dockerfile: dockerfile
     hostname: api_main-03
+    expose:
+      - "8010"
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
@@ -88,11 +94,15 @@ services:
       context: ./
       dockerfile: ./load-balancer/Dockerfile
     links:
-        - api_main-01
-        - api_main-02
-        - api_main-03
+      - api_main-01
+      - api_main-02
+      - api_main-03
+    depends_on:
+      - api_main-01
+      - api_main-02
+      - api_main-03
     ports:
-        - '8011:8011'
+      - '8011:8011'
 
 volumes:
   saruman-docker-data:
