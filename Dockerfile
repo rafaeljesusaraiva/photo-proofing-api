@@ -21,10 +21,11 @@ echo "______________________updating inotify __________________________" \n\
 echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p \n\
 echo "updated value is" \n\
 cat /etc/sysctl.conf | grep fs.inotify \n\
-exec yarn start:dev \
+exec yarn start \
 " >> /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 8010
-CMD ["yarn", "start"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# CMD ["yarn", "start"]
