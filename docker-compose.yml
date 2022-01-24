@@ -9,8 +9,8 @@ services:
       - saruman-docker-data:/saruman-data
     expose:
       - 8010
-    #ports:
-    #  - "8010:8010"
+    ports:
+     - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -22,7 +22,7 @@ services:
       - NODEMAILER_PASS=${NODEMAILER_PASS}
       - PORT=${PORT}
       - WEB_URL=${WEB_URL}
-    #network_mode: host
+    network_mode: host
 
   rafaeljesusaraiva-api-02:
     build:
