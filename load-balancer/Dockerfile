@@ -1,5 +1,4 @@
 FROM nginx:stable-alpine 
-WORKDIR /
 COPY . /etc/nginx/conf.d/
 
 # forward request and error logs to docker log collector
