@@ -31,30 +31,29 @@ module.exports = {
                     size: sizeName,
                     quantity: 1
                 }
-                continue;
-            }
+            } else {
+                // Comparar com objeto temporário
+                // Se igual, incrementar
+                if (albumObj.slug === tSingleProduct.album_slug && watermarkImage === tSingleProduct.watermark && sizeName === tSingleProduct.size) {
+                    tSingleProduct.quantity++;
+                }
+                // Se diferente, adicionar temporarío a array e substituir
+                else {
+                    newArray.push(tSingleProduct);
 
-            // Comparar com objeto temporário
-            // Se igual, incrementar
-            if (albumObj.slug === tSingleProduct.album_slug && watermarkImage === tSingleProduct.watermark && sizeName === tSingleProduct.size) {
-                tSingleProduct.quantity++;
-            }
-            // Se diferente, adicionar temporarío a array e substituir
-            else {
-                newArray.push(tSingleProduct);
-
-                tSingleProduct = {
-                    album: albumObj.title,
-                    album_slug: albumObj.slug,
-                    filename: noWatermarkImage,
-                    watermark: watermarkImage,
-                    size: sizeName,
-                    quantity: 1
+                    tSingleProduct = {
+                        album: albumObj.title,
+                        album_slug: albumObj.slug,
+                        filename: noWatermarkImage,
+                        watermark: watermarkImage,
+                        size: sizeName,
+                        quantity: 1
+                    }
                 }
             }
             
             // Caso seja último elemento do input, adicionar temporario a array
-            if (index+1 === array.length) {
+            if (index === array.length - 1) {
                 newArray.push(tSingleProduct);
             }
         }
@@ -129,7 +128,7 @@ module.exports = {
                 } else {
                     PrintList[exists].quantity += singlePhoto.quantity;
                 }
-                PrintTotal++;
+                PrintTotal += singlePhoto.quantity;
             }
 
             //
