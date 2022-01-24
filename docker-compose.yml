@@ -77,7 +77,8 @@ services:
       - rafaeljesusaraiva-api-03
     ports:
       - "8009:8009"
-    network_mode: host
+    expose:
+      - "8009"
 
 volumes:
   saruman-docker-data:
