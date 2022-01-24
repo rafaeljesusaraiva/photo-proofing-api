@@ -69,7 +69,7 @@ services:
   haproxy:
     image: hypriot/rpi-haproxy
     volumes:
-      - haproxy:/haproxy-override
+      - saruman-docker-data/haproxy:/haproxy-override
     links:
       - rafaeljesusaraiva-api-01
       - rafaeljesusaraiva-api-02
@@ -81,5 +81,4 @@ volumes:
   saruman-docker-data:
     external: true
     name: saruman-docker
-  haproxy:
     
