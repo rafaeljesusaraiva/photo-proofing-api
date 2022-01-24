@@ -26,6 +26,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    hostname: api_main-01
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
@@ -45,6 +46,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    hostname: api_main-02
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
@@ -63,7 +65,8 @@ services:
   api_main-03:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
+    hostname: api_main-03
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
