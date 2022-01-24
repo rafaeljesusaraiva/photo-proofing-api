@@ -7,8 +7,10 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    ports:
-      - "8010:8010"
+    expose:
+      - 8010
+    #ports:
+    #  - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -29,8 +31,10 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    ports:
-      - "8010:8010"
+    expose:
+      - 8010
+    #ports:
+    #  - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
@@ -51,8 +55,10 @@ services:
     image: rafaeljesusaraiva-api/latest
     volumes:
       - saruman-docker-data:/saruman-data
-    ports:
-      - "8010:8010"
+    expose:
+      - 8010
+    #ports:
+    #  - "8010:8010"
     environment:
       - TOKEN_KEY=${TOKEN_KEY}
       - INFLUXDB_HOST=${INFLUXDB_HOST}
