@@ -77,7 +77,7 @@ services:
     volumes:
       - saruman-docker-data:/saruman-data
       - haproxy:/haproxy-override
-    command: bash -c "cp /saruman-data/haproxy-api/haproxy.cfg /haproxy-override/haproxy.cfg"
+    command: sh -c "cp /saruman-data/haproxy-api/haproxy.cfg /haproxy-override/haproxy.cfg"
     links:
       - rafaeljesusaraiva-api-01
       - rafaeljesusaraiva-api-02
