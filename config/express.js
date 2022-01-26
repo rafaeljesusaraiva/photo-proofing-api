@@ -7,7 +7,7 @@ const responseTime = require('response-time')
 const influxLogging = require('../api/middleware/influxLogging');
 require('dotenv').config();
 
-var corsOptions = { origin: "*", exposedHeaders: '*', credentials: true };
+var corsOptions = { origin: ["https://provas.rafaeljesusaraiva.pt", "https://api-provas.rafaeljesusaraiva.pt"], exposedHeaders: '*', credentials: true };
 
 module.exports = () => {
   const app = express();
@@ -17,8 +17,7 @@ module.exports = () => {
   app.use(addRequestId);
 
   // USAR CORS
-  // app.use(cors(corsOptions));
-  app.use(function(req,res) { res.setHeader("Access-Control-Allow-Origin", "*"); next(); });
+  app.use(cors(corsOptions));
 
   // MIDDLEWARES
   app.use(bodyParser.json({limit: '40mb', extended: true}))
