@@ -17,7 +17,8 @@ module.exports = () => {
   app.use(addRequestId);
 
   // USAR CORS
-  app.use(cors(corsOptions));
+  // app.use(cors(corsOptions));
+  app.use(function(req,res) { res.setHeader("Access-Control-Allow-Origin", "*"); next(); });
 
   // MIDDLEWARES
   app.use(bodyParser.json({limit: '40mb', extended: true}))
