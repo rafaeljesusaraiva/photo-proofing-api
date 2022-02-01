@@ -62,7 +62,6 @@ module.exports = {
     },
     condense_orderList: async function (array) {
         let newArray = [];
-
         // [{ cliente: $string, tel: $integer, email: $string, items: [{ album: $string, filename: $string, quantity: $integer }, ...] }, ...]
         for (const [index, order] of array.entries()) {
             newArray.push({
@@ -78,7 +77,6 @@ module.exports = {
                 items: this.condense_photoList(order.products)
             })
         }
-
         return newArray;
     },
     // Returns false if does not exist or printList index of matching photo
@@ -108,7 +106,7 @@ module.exports = {
 
         // Filter out orders already fullfilled
         for (let orderIndex=0; orderIndex < orders.length; orderIndex++) {
-            if (orders[orderIndex].status !== 'Recebida' && orders[orderIndex].status !== 'Paga' && orders[orderIndex].status !== 'A Processar')
+            if (orders[orderIndex].status !== 'Recebida - Por Pagar' && orders[orderIndex].status !== 'Paga' && orders[orderIndex].status !== 'A Processar')
                 orders.splice(orderIndex, 1);
         }
 

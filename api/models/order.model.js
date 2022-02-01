@@ -15,7 +15,7 @@ module.exports = mongoose => {
                 }
             ],
             totalNoPromotion: { type: Number, required: true, min: 0 },
-            status: { type: String, default: 'Recebida', required: true },
+            status: { type: String, default: 'Recebida - Por Pagar', required: true },
             note: { type: String }
         },
         { timestamps: true }
