@@ -245,7 +245,7 @@ module.exports = () => {
 
         let currentDate = dayjs().add(12, 'hour');
         let weeksAgo = dayjs().subtract(14, 'day');
-        const orders = await Order.find({createdAt: { $gte: weeksAgo, $lt: currentDate }, status: { $ne: "Cancelada" }})
+        const orders = await Order.find({createdAt: { $gte: weeksAgo, $lt: currentDate }, status: { $nin: ["Cancelada", 'Paga', 'Entregue'] }})
                                     .populate('client')
                                     .populate('promotion')
                                     .populate({

@@ -1,6 +1,6 @@
 module.exports = mongoose => {
-    const orderPhases = ['Recebida - Por Pagar', 'Paga', 'A Processar', 'Em Entrega', 'Entregue', 'Cancelada']
-    const processingIndex = orderPhases.indexOf('A Processar');
+    const orderPhases = ['Recebida - Por Pagar', 'Cancelada', 'A Processar', 'Em Entrega', 'Paga', 'Entregue']
+    const processingIndex = orderPhases.indexOf('Paga');
 
     var schema = mongoose.Schema(
         {
@@ -15,7 +15,7 @@ module.exports = mongoose => {
                 }
             ],
             totalNoPromotion: { type: Number, required: true, min: 0 },
-            status: { type: String, default: 'Recebida - Por Pagar', required: true },
+            status: { type: String, default: orderPhases[0], required: true },
             note: { type: String }
         },
         { timestamps: true }
