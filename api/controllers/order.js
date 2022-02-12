@@ -243,8 +243,6 @@ module.exports = () => {
 
     controller.stats_admin = async (req, res) => {
 
-        let currentDate = dayjs().add(12, 'hour');
-        let weeksAgo = dayjs().subtract(14, 'day');
         const orders = await Order.find({status: { $nin: ["Cancelada", 'Paga', 'Entregue'] }})
                                     .populate('client')
                                     .populate('promotion')
@@ -501,7 +499,7 @@ module.exports = () => {
 
     controller.process_orders = async (req, res) => {
         // Get All Orders
-        const orders = await Order.find()
+        const orders = await Order.find({status: { $nin: ['Cancelada', 'A Processar', 'Em Entrega', 'Paga', 'Entregue'] }})
                             .populate('client')
                             .populate('promotion')
                             .populate('payment')
@@ -562,7 +560,7 @@ module.exports = () => {
 
     controller.process_orders_zip = async (req, res) => {
         // Get All Orders
-        const orders = await Order.find()
+        const orders = await Order.find({status: { $nin: ['Cancelada', 'A Processar', 'Em Entrega', 'Paga', 'Entregue'] }})
                             .populate('client')
                             .populate('promotion')
                             .populate('payment')
