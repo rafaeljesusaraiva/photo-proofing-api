@@ -8,12 +8,11 @@ const influxLogging = require("../api/middleware/influxLogging");
 require("dotenv").config();
 
 var corsOptions = {
-  origin: "*",
-  // origin: [
-  //   "https://provas.rafaeljesusaraiva.pt",
-  //   "https://api-provas.rafaeljesusaraiva.pt",
-  //   "http://localhost:3000",
-  // ],
+  origin: [
+    "https://provas.rafaeljesusaraiva.pt",
+    "http://provas2.rafaeljesusaraiva.pt",
+    "https://api-provas.rafaeljesusaraiva.pt",
+  ],
   exposedHeaders: "*",
   credentials: true,
 };
