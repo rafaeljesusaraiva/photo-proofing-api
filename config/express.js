@@ -11,7 +11,7 @@ var corsOptions = {
   origin: [
     "https://provas.rafaeljesusaraiva.pt",
     "https://api-provas.rafaeljesusaraiva.pt",
-    "*",
+    "http://localhost:3000",
   ],
   exposedHeaders: "*",
   credentials: true,
