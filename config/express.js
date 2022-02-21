@@ -1,21 +1,22 @@
 const express = require("express");
 const config = require("config");
 const consign = require("consign");
-// const cors = require("cors");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const responseTime = require("response-time");
 const influxLogging = require("../api/middleware/influxLogging");
 require("dotenv").config();
 
-// var corsOptions = {
-//   origin: [
-//     "https://provas.rafaeljesusaraiva.pt",
-//     "https://api-provas.rafaeljesusaraiva.pt",
-//     "http://localhost:3000",
-//   ],
-//   exposedHeaders: "*",
-//   credentials: true,
-// };
+var corsOptions = {
+  origin: "*",
+  // origin: [
+  //   "https://provas.rafaeljesusaraiva.pt",
+  //   "https://api-provas.rafaeljesusaraiva.pt",
+  //   "http://localhost:3000",
+  // ],
+  exposedHeaders: "*",
+  credentials: true,
+};
 
 module.exports = () => {
   const app = express();
@@ -25,17 +26,7 @@ module.exports = () => {
   app.use(addRequestId);
 
   // USAR CORS
-  // app.use(cors(corsOptions));
-  app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.header("Access-Control-Allow-Credentials", true);
-    next();
-  });
+  app.use(cors(corsOptions));
 
   // MIDDLEWARES
   app.use(bodyParser.json({ limit: "40mb", extended: true }));
