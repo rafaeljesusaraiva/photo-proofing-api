@@ -9,7 +9,7 @@ app.listen(port, () => {
   var os = require("os");
 
   console.log("------------------------------------");
-  console.log("Development version: 1.3.8b");
+  console.log("Development version: 1.3.9");
   console.log("Running on host: " + os.hostname());
   console.log(`Available at port: ${port}`);
   console.log("------------------------------------");
