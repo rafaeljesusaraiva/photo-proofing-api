@@ -261,7 +261,7 @@ module.exports = () => {
 
   controller.stats_admin = async (req, res) => {
     const orders = await Order.find({
-      status: { $nin: ["Cancelada", "Paga", "Entregue"] },
+      status: { $nin: ["Cancelada", "Entregue"] },
     })
       .populate("client")
       .populate("promotion")
@@ -554,7 +554,7 @@ module.exports = () => {
   controller.process_orders = async (req, res) => {
     // Get All Orders
     const orders = await Order.find({
-      status: { $nin: ["Cancelada", "Em Entrega", "Paga", "Entregue"] },
+      status: { $nin: ["Cancelada", "Em Entrega", "Entregue"] },
     })
       .populate("client")
       .populate("promotion")
@@ -635,7 +635,7 @@ module.exports = () => {
   controller.process_orders_zip = async (req, res) => {
     // Get All Orders
     const orders = await Order.find({
-      status: { $nin: ["Cancelada", "Em Entrega", "Paga", "Entregue"] },
+      status: { $nin: ["Cancelada", "Em Entrega", "Entregue"] },
     })
       .populate("client")
       .populate("promotion")
